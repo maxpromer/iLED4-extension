@@ -40,6 +40,7 @@ numbertable = bytes([
 	0x71, # F
 ])
 
+displaybuffer = [ 0 ] * 8
 position = 0
 
 def setBrightness(b):
@@ -106,10 +107,12 @@ def writeDigitRaw(d, bitmask):
 	displaybuffer[d] = bitmask
 
 def drawColon(state):
+	global displaybuffer
 	displaybuffer[4] = 0x01 if state else 0
 	writeDisplay()
 
 def writeColon():
+	global displaybuffer
 	i2c1.writeto(ADDR, bytes({ 0x08, displaybuffer[4] & 0xFF, displaybuffer[4] >> 8 }))
 
 def writeDigitNum(d, num, dot):
@@ -191,6 +194,7 @@ def printError():
 		writeDigitRaw(i, 0x00 if i == 2 else 0x40)
 
 def showDotPoint(x, show):
+	global displaybuffer
 	if x > 4:
 		return False
 	if x == 4:
@@ -200,7 +204,7 @@ def showDotPoint(x, show):
 	if show:
 		displaybuffer[x] = displaybuffer[x] | (1 << 7)
 	else:
-		displaybuffer[x] &= displaybuffer[x] & (~(1 << 7))
+		displaybuffer[x] = displaybuffer[x] & (~(1 << 7))
 	
 	writeDisplay()
 
