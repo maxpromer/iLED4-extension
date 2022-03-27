@@ -13,7 +13,7 @@ Blockly.Python['iled_show_digit_at'] = function (block) {
 
   var value_number = Blockly.Python.valueToCode(block, 'number', Blockly.Python.ORDER_ATOMIC) || '0';
   var value_pos = Blockly.Python.valueToCode(block, 'pos', Blockly.Python.ORDER_ATOMIC) || '0';
-  var code = `iLED4.writeDigitNum(${value_pos}, ${value_number}, false)\n`;
+  var code = `iLED4.writeDigitNum(${value_pos}, ${value_number}, False)\n`;
   return code;
 };
 
@@ -22,7 +22,7 @@ Blockly.Python['iled_show_char_at'] = function (block) {
 
   var dropdown_char = block.getFieldValue('char');
   var value_pos = Blockly.Python.valueToCode(block, 'pos', Blockly.Python.ORDER_ATOMIC) || '0';
-  var code = `iLED4.writeDigitNum(${value_pos}, ${dropdown_char}, false)\n`;
+  var code = `iLED4.writeDigitNum(${value_pos}, ${dropdown_char}, False)\n`;
   return code;
 };
 
