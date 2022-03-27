@@ -54,7 +54,7 @@ Blockly.defineBlocksWithJsonArray([
     "inputsInline": true,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SHOW_NUMBER_TOOLTIP,
     "helpUrl": ""
   },
@@ -76,7 +76,7 @@ Blockly.defineBlocksWithJsonArray([
     "inputsInline": true,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SHOW_DIGIT_AT_TOOLTIP,
     "helpUrl": ""
   },
@@ -163,7 +163,7 @@ Blockly.defineBlocksWithJsonArray([
     "inputsInline": true,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SHOW_CHAR_AT_TOOLTIP,
     "helpUrl": ""
   },
@@ -180,7 +180,7 @@ Blockly.defineBlocksWithJsonArray([
     "inputsInline": true,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SHOW_HEX_NUMBER_TOOLTIP,
     "helpUrl": ""
   },
@@ -189,7 +189,7 @@ Blockly.defineBlocksWithJsonArray([
     "message0": Blockly.Msg.ILED_TURN_ON_MESSAGE,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_TURN_ON_TOOLTIP,
     "helpUrl": ""
   },
@@ -198,7 +198,7 @@ Blockly.defineBlocksWithJsonArray([
     "message0": Blockly.Msg.ILED_TURN_OFF_MESSAGE,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_TURN_OFF_TOOLTIP,
     "helpUrl": ""
   },
@@ -207,7 +207,7 @@ Blockly.defineBlocksWithJsonArray([
     "message0": Blockly.Msg.ILED_CLEAR_MESSAGE,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_CLEAR_TOOLTIP,
     "helpUrl": ""
   },
@@ -237,7 +237,7 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SET_DOTPOINT_TOOLTIP,
     "helpUrl": ""
   },
@@ -262,7 +262,7 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SET_COLON_TOOLTIP,
     "helpUrl": ""
   },
@@ -279,7 +279,7 @@ Blockly.defineBlocksWithJsonArray([
     "inputsInline": true,
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 105,
+    "colour": "#2ECC71",
     "tooltip": Blockly.Msg.ILED_SET_INTENSITY_TOOLTIP,
     "helpUrl": ""
   }
