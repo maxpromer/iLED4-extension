@@ -226,11 +226,11 @@ Blockly.defineBlocksWithJsonArray([
         "options": [
           [
             Blockly.Msg.ILED_SET_DOTPOINT_TRUE_MESSAGE,
-            "true"
+            "True"
           ],
           [
             Blockly.Msg.ILED_SET_DOTPOINT_FALSE_MESSAGE,
-            "false"
+            "False"
           ]
         ]
       }
@@ -251,11 +251,11 @@ Blockly.defineBlocksWithJsonArray([
         "options": [
           [
             Blockly.Msg.ILED_SET_DOTPOINT_TRUE_MESSAGE,
-            "true"
+            "True"
           ],
           [
             Blockly.Msg.ILED_SET_DOTPOINT_FALSE_MESSAGE,
-            "false"
+            "False"
           ]
         ]
       }

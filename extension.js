@@ -56,17 +56,6 @@
                 </block>
             `
         },
-        {
-            xml: `
-                <block type="iled_show_hex_number">
-                    <value name="number">
-                        <shadow type="math_number">
-                            <field name="VALUE">255</field>
-                        </shadow>
-                    </value>
-                </block>
-            `
-        },
         "iled_turn_on",
         "iled_turn_off",
         "iled_clear",
