@@ -30,7 +30,7 @@ Blockly.Python['iled_show_hex_number'] = function (block) {
   Blockly.Python.definitions_['import_iLED4'] = 'import iLED4';
 
   var value_number = Blockly.Python.valueToCode(block, 'number', Blockly.Python.ORDER_ATOMIC) || '0';
-  var code = `iLED4.print((int)(${value_number}), 16)\n`;
+  var code = `iLED4.printFloat(int(${value_number}), 0, 16)\n`;
   return code;
 };
 
@@ -78,7 +78,7 @@ Blockly.Python['iled_set_intensity'] = function (block) {
   Blockly.Python.definitions_['import_iLED4'] = 'import iLED4';
 
   var value_intensity = Blockly.Python.valueToCode(block, 'intensity', Blockly.Python.ORDER_ATOMIC) || '15';
-  
+
   var code = `iLED4.setBrightness(${value_intensity})\n`;
   return code;
 };

@@ -20,7 +20,6 @@ iLED_CMD_BRIGHTNESS=0xE0
 
 SEVENSEG_DIGITS = 5 # Digits in 7-seg displays, plus NUL end
 
-
 numbertable = bytes([
 	0x3F, # 0
 	0x06, # 1 
@@ -44,8 +43,7 @@ displaybuffer = [ 0 ] * 8
 position = 0
 
 def setBrightness(b):
-	if b > 15:
-		b = 15
+	b = min(b, 15)
 	
 	i2c1.writeto(ADDR, bytes([ iLED_CMD_BRIGHTNESS | b ]))
 
@@ -76,30 +74,6 @@ def clear():
 	displaybuffer = [ 0 ] * len(displaybuffer)
 	writeDisplay()
 
-def print(n, base):
-	if base == 0:
-		write(n)
-	else:
-		printNumber(n, base)
-
-def write(c):
-	global position
-	r = 0
-	if c == '\n':
-		position = 0
-	if c == '\r':
-		position = 0
-
-	if c >= '0' and c <= '9':
-		writeDigitNum(position, c - '0')
-		r = 1
-
-	position = position + 1
-	if position == 2:
-		position = position + 1
-
-	return r
-
 def writeDigitRaw(d, bitmask):
 	global displaybuffer
 	if d > 4:
@@ -111,19 +85,13 @@ def drawColon(state):
 	displaybuffer[4] = 0x01 if state else 0
 	writeDisplay()
 
-def writeColon():
-	global displaybuffer
-	i2c1.writeto(ADDR, bytes({ 0x08, displaybuffer[4] & 0xFF, displaybuffer[4] >> 8 }))
-
 def writeDigitNum(d, num, dot):
+	global numbertable
 	if d > 4:
 		return None
 
 	writeDigitRaw(d, numbertable[num] | (dot << 7))
 	writeDisplay()
-
-def printNumber(n, base):
-	printFloat(n, 0, base)
 
 def printFloat(n, fracDigits, base):
 	numericDigits = 4 # available digits on display
