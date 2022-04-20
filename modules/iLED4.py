@@ -23,165 +23,166 @@ iLED_CMD_BRIGHTNESS=0xE0
 SEVENSEG_DIGITS = 5 # Digits in 7-seg displays, plus NUL end
 
 numbertable = bytes([
-	0x3F, # 0
-	0x06, # 1 
-	0x5B, # 2
-	0x4F, # 3
-	0x66, # 4
-	0x6D, # 5
-	0x7D, # 6
-	0x07, # 7
-	0x7F, # 8
-	0x6F, # 9
-	0x77, # a
-	0x7C, # b
-	0x39, # C
-	0x5E, # d
-	0x79, # E
-	0x71, # F
+    0x3F, # 0
+    0x06, # 1 
+    0x5B, # 2
+    0x4F, # 3
+    0x66, # 4
+    0x6D, # 5
+    0x7D, # 6
+    0x07, # 7
+    0x7F, # 8
+    0x6F, # 9
+    0x77, # a
+    0x7C, # b
+    0x39, # C
+    0x5E, # d
+    0x79, # E
+    0x71, # F
 ])
 
 displaybuffer = [ 0 ] * 8
 position = 0
 
 def setBrightness(b):
-	b = min(b, 15)
-	
-	i2c1.writeto(ADDR, bytes([ iLED_CMD_BRIGHTNESS | b ]))
+    b = min(b, 15)
+    i2c1.writeto(ADDR, bytes([ iLED_CMD_BRIGHTNESS | b ]))
 
 def blinkRate(b):
-	if b > 3:
-		b = 0 # turn off if not sure
+    if b > 3:
+        b = 0 # turn off if not sure
 
-	i2c1.writeto(ADDR, bytes([ iLED_BLINK_CMD | iLED_BLINK_DISPLAYON | (b << 1) ]))
+    i2c1.writeto(ADDR, bytes([ iLED_BLINK_CMD | iLED_BLINK_DISPLAYON | (b << 1) ]))
 
 def begin():
-	i2c1.writeto(ADDR, bytes([ 0x21 ]))
+    i2c1.writeto(ADDR, bytes([ 0x21 ]))
 
-	blinkRate(iLED_BLINK_OFF)
-	setBrightness(15); # max brightness
+    blinkRate(iLED_BLINK_OFF)
+    setBrightness(15); # max brightness
 
 def writeDisplay():
-	global displaybuffer
-	data = bytearray(1 + 16)
-	data[0] = 0x00
-	for i in range(8):
-		data[1 + (i * 2) + 0] = displaybuffer[i] & 0xFF
-		data[1 + (i * 2) + 1] = displaybuffer[i] >> 8
+    global displaybuffer
+    data = bytearray(1 + 16)
+    data[0] = 0x00
+    for i in range(8):
+        data[1 + (i * 2) + 0] = displaybuffer[i] & 0xFF
+        data[1 + (i * 2) + 1] = displaybuffer[i] >> 8
 
-	i2c1.writeto(ADDR, bytes(data))
+    i2c1.writeto(ADDR, bytes(data))
 
 def clear():
-	global displaybuffer
-	displaybuffer = [ 0 ] * len(displaybuffer)
-	writeDisplay()
+    global displaybuffer
+    displaybuffer = [ 0 ] * len(displaybuffer)
+    writeDisplay()
 
 def writeDigitRaw(d, bitmask):
-	global displaybuffer
-	if d > 4:
-		return None
-	displaybuffer[d] = bitmask
+    global displaybuffer
+    if d > 4:
+        return None
+    if d < 0:
+        d = 0
+    displaybuffer[d] = bitmask
 
 def drawColon(state):
-	global displaybuffer
-	displaybuffer[4] = 0x01 if state else 0
-	writeDisplay()
+    global displaybuffer
+    displaybuffer[4] = 0x01 if state else 0
+    writeDisplay()
 
 def writeDigitNum(d, num, dot):
-	global numbertable
-	if d > 4:
-		return None
+    global numbertable
+    if d > 4:
+        return None
+    print("Num => {}".format(num))
+    writeDigitRaw(d, numbertable[int(num)] | (dot << 7))
+    writeDisplay()
 
-	writeDigitRaw(d, numbertable[num] | (dot << 7))
-	writeDisplay()
+def printFloat(n, fracDigits=0, base=10):
+    numericDigits = 4 # available digits on display
+    isNegative = False # true if the number is negative
 
-def printFloat(n, fracDigits, base):
-	numericDigits = 4 # available digits on display
-	isNegative = False # true if the number is negative
+    # is the number negative?
+    if n < 0:
+        isNegative = True # need to draw sign later
+        numericDigits = numericDigits - 1;   # the sign will take up one digit
+        n = n * -1		   # pretend the number is positive
 
-	# is the number negative?
-	if n < 0:
-		isNegative = True # need to draw sign later
-		numericDigits = numericDigits - 1;   # the sign will take up one digit
-		n = n * -1		   # pretend the number is positive
+    # calculate the factor required to shift all fractional digits
+    # into the integer part of the number
+    toIntFactor = 1.0
+    for i in range(fracDigits):
+        toIntFactor = toIntFactor * base
 
-	# calculate the factor required to shift all fractional digits
-	# into the integer part of the number
-	toIntFactor = 1.0
-	for i in range(fracDigits):
-		toIntFactor = toIntFactor * base
+    # create integer containing digits to display by applying
+    # shifting factor and rounding adjustment
+    displayNumber = n * toIntFactor + 0.5
 
-	# create integer containing digits to display by applying
-	# shifting factor and rounding adjustment
-	displayNumber = n * toIntFactor + 0.5
+    # calculate upper bound on displayNumber given
+    # available digits on display
+    tooBig = 1
+    for i in range(numericDigits):
+        tooBig = tooBig * base
 
-	# calculate upper bound on displayNumber given
-	# available digits on display
-	tooBig = 1
-	for i in range(numericDigits):
-		tooBig = tooBig * base
+    # if displayNumber is too large, try fewer fractional digits
+    while displayNumber >= tooBig:
+        fracDigits = fracDigits - 1
+        toIntFactor = toIntFactor / base
+        displayNumber = n * toIntFactor + 0.5
 
-	# if displayNumber is too large, try fewer fractional digits
-	while displayNumber >= tooBig:
-		fracDigits = fracDigits - 1
-		toIntFactor = toIntFactor / base
-		displayNumber = n * toIntFactor + 0.5
+    # did toIntFactor shift the decimal off the display?
+    if toIntFactor < 1:
+        printError()
+    else:
+        # otherwise, display the number
+        displayPos = 3
 
-	# did toIntFactor shift the decimal off the display?
-	if toIntFactor < 1:
-		printError()
-	else:
-		# otherwise, display the number
-		displayPos = 3
+        if displayNumber: # if displayNumber is not 0
+            i = 0
+            while displayNumber or i <= fracDigits:
+                displayDecimal = (fracDigits != 0 and i == fracDigits)
+                writeDigitNum(displayPos, displayNumber % base, displayDecimal)
+                displayPos = displayPos - 1
+                displayNumber /= base
+                i = i + 1
 
-		if displayNumber: # if displayNumber is not 0
-			i = 0
-			while displayNumber or i <= fracDigits:
-				displayDecimal = (fracDigits != 0 and i == fracDigits)
-				writeDigitNum(displayPos, displayNumber % base, displayDecimal)
-				displayPos = displayPos - 1
-				displayNumber /= base
-				i = i + 1
+        else:
+            writeDigitNum(displayPos, 0, False)
+            displayPos = displayPos - 1
 
-		else:
-			writeDigitNum(displayPos, 0, False)
-			displayPos = displayPos - 1
+        # display negative sign if negative
+        if isNegative:
+            writeDigitRaw(displayPos, 0x40)
+            displayPos = displayPos - 1
 
-		# display negative sign if negative
-		if isNegative:
-			writeDigitRaw(displayPos, 0x40)
-			displayPos = displayPos - 1
-
-		# clear remaining display positions
-		while displayPos >= 0:
-			writeDigitRaw(displayPos, 0x00)
-			displayPos = displayPos - 1
-	
-	writeDisplay()
+        # clear remaining display positions
+        while displayPos >= 0:
+            writeDigitRaw(displayPos, 0x00)
+            displayPos = displayPos - 1
+    
+    writeDisplay()
 
 def printError():
-	for i in range(SEVENSEG_DIGITS):
-		writeDigitRaw(i, 0x00 if i == 2 else 0x40)
+    for i in range(SEVENSEG_DIGITS):
+        writeDigitRaw(i, 0x00 if i == 2 else 0x40)
 
 def showDotPoint(x, show):
-	global displaybuffer
-	if x > 4:
-		return False
-	if x == 4:
-		drawColon(show)
-		return True
+    global displaybuffer
+    if x > 4:
+        return False
+    if x == 4:
+        drawColon(show)
+        return True
 
-	if show:
-		displaybuffer[x] = displaybuffer[x] | (1 << 7)
-	else:
-		displaybuffer[x] = displaybuffer[x] & (~(1 << 7))
-	
-	writeDisplay()
+    if show:
+        displaybuffer[x] = displaybuffer[x] | (1 << 7)
+    else:
+        displaybuffer[x] = displaybuffer[x] & (~(1 << 7))
+    
+    writeDisplay()
 
 def turn_on():
-	i2c1.writeto(ADDR, bytes([ 0x81 ]))
+    i2c1.writeto(ADDR, bytes([ 0x81 ]))
 
 def turn_off():
-	i2c1.writeto(ADDR, bytes([ 0x80 ]))
+    i2c1.writeto(ADDR, bytes([ 0x80 ]))
 
 begin()
