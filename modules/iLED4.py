@@ -97,67 +97,50 @@ def writeDigitNum(d, num, dot):
     writeDisplay()
 
 def printFloat(n, fracDigits=0, base=10):
-    numericDigits = 4 # available digits on display
-    isNegative = False # true if the number is negative
-
-    # is the number negative?
-    if n < 0:
-        isNegative = True # need to draw sign later
-        numericDigits = numericDigits - 1;   # the sign will take up one digit
-        n = n * -1		   # pretend the number is positive
-
-    # calculate the factor required to shift all fractional digits
-    # into the integer part of the number
-    toIntFactor = 1.0
-    for i in range(fracDigits):
-        toIntFactor = toIntFactor * base
-
-    # create integer containing digits to display by applying
-    # shifting factor and rounding adjustment
-    displayNumber = n * toIntFactor + 0.5
-
-    # calculate upper bound on displayNumber given
-    # available digits on display
-    tooBig = 1
-    for i in range(numericDigits):
-        tooBig = tooBig * base
-
-    # if displayNumber is too large, try fewer fractional digits
-    while displayNumber >= tooBig:
-        fracDigits = fracDigits - 1
-        toIntFactor = toIntFactor / base
-        displayNumber = n * toIntFactor + 0.5
-
-    # did toIntFactor shift the decimal off the display?
-    if toIntFactor < 1:
-        printError()
+    n_str = ""
+    if base == 10:
+        n_str = '{:.{prec}f}'.format(n, prec=fracDigits)
+    elif base == 16:
+        n_str = hex(int(n))[2:]
+    elif base == 2:
+        n_str = "{0:b}".format(n)
+    elif base == 8:
+        n_str = oct(int(n))[2:]
     else:
-        # otherwise, display the number
-        displayPos = 3
-
-        if displayNumber: # if displayNumber is not 0
-            i = 0
-            while displayNumber or i <= fracDigits:
-                displayDecimal = (fracDigits != 0 and i == fracDigits)
-                writeDigitNum(displayPos, displayNumber % base, displayDecimal)
-                displayPos = displayPos - 1
-                displayNumber /= base
-                i = i + 1
-
+        return False
+    n_str = bytearray(n_str)
+    # print("Str: {}".format(n_str.decode('utf-8')))
+    add_padding = 4
+    for i in range(0, len(n_str)):
+        c = n_str[i]
+        if (c >= ord('0') and c <= ord('9')) or (c >= ord('a') and c <= ord('f')):
+            add_padding = add_padding - 1
+        elif c == ord('.'):
+            continue # Skip
+        elif c == ord('-'):
+            add_padding = add_padding - 1
+    digi = 0 if add_padding < 0 else add_padding
+    for i in range(0, len(n_str)):
+        c = n_str[i]
+        if (c >= ord('0') and c <= ord('9')) or (c >= ord('a') and c <= ord('f')):
+            c_num = 0
+            if c >= ord('0') and c <= ord('9'):
+                c_num = c - ord('0')
+            elif c >= ord('a') and c <= ord('f'):
+                c_num = c - ord('a') + 10
+            dot = 1 if len(n_str) > (i + 1) and n_str[i + 1] == ord('.') and digi < 3 else 0
+            # print("Digi {} write {} dot {}".format(digi, c_num, dot))
+            writeDigitRaw(digi, numbertable[int(c_num)] | (dot << 7))
+        elif c == ord('.'):
+            continue # Skip
+        elif c == ord('-'):
+            # print("Digi {} write 0x40 dot 0".format(digi))
+            writeDigitRaw(digi, 0x40)
         else:
-            writeDigitNum(displayPos, 0, False)
-            displayPos = displayPos - 1
-
-        # display negative sign if negative
-        if isNegative:
-            writeDigitRaw(displayPos, 0x40)
-            displayPos = displayPos - 1
-
-        # clear remaining display positions
-        while displayPos >= 0:
-            writeDigitRaw(displayPos, 0x00)
-            displayPos = displayPos - 1
-    
+            writeDigitRaw(digi, 0x00)
+        digi = digi + 1
+        if digi > 3:
+            break
     writeDisplay()
 
 def printError():

@@ -3,7 +3,7 @@
     description: "4-digit LED display I2C interface",
     author: "INEX",
     category: "Display",
-    version: "1.0.0",
+    version: "1.1.0",
     icon: "/static/icon.png", // Category icon
     color: "#3498DB", // Category color (recommend some blocks color)
     blocks: [ // Blocks in Category
